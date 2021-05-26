@@ -1,0 +1,13 @@
+name: Slack Reporter
+description: Reports about command status to Slack
+author: https://github.com/convidera
+requirements:
+  - bash
+  - curl
+configuration:
+  properties:
+    token:
+      type: string
+    channel:
+      type: string
+  additionalProperties: false

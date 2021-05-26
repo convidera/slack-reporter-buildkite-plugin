@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+TOKEN=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_TOKEN:-"SLACK_TOKEN"})
+CHANNEL=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_CHANNEL:-"SLACK_CHANNEL"})
+
+STATUS="succeeded"
+if [ ${BUILDKITE_COMMAND_EXIT_STATUS} -ne 0 ]; then
+  STATUS="failed"
+fi
+
+MESSAGE="Job ${BUILDKITE_LABEL} in repository ${BUILDKITE_REPO}, branch ${BUILDKITE_BRANCH} ${STATUS}";
+
+JSON=$(curl -sL -X POST \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d "{\"channel\": \"${CHANNEL}\", \"text\": \"${MESSAGE}\", \"ts\": \"${SLACK_TS}\"}" \
+  https://slack.com/api/chat.update)

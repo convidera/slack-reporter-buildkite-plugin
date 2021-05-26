@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euo pipefail
+
+TOKEN=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_TOKEN:-"SLACK_TOKEN"})
+CHANNEL=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_CHANNEL:-"SLACK_CHANNEL"})
+MESSAGE="Job ${BUILDKITE_LABEL} in repository ${BUILDKITE_REPO}, branch ${BUILDKITE_BRANCH} started";
+
+JSON=$(curl -sL -X POST \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d "{\"channel\": \"${CHANNEL}\", \"text\": \"${MESSAGE}\"}" \
+  https://slack.com/api/chat.postMessage)
+
+export SLACK_TS=$(echo ${JSON} | jq -r .ts)
+
+echo $SLACK_TS
