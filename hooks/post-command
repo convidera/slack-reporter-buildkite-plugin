@@ -5,14 +5,24 @@ set -euo pipefail
 TOKEN=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_TOKEN:-"SLACK_TOKEN"})
 CHANNEL=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_CHANNEL:-"SLACK_CHANNEL"})
 
-MESSAGE=":ok_hand: Job *${BUILDKITE_LABEL}* in repository *${BUILDKITE_REPO}*, branch ${BUILDKITE_BRANCH} completed";
+COLOR="good"
 if [ ${BUILDKITE_COMMAND_EXIT_STATUS} -ne 0 ]; then
-  MESSAGE=":no_entry: Job *${BUILDKITE_LABEL}* in repository *${BUILDKITE_REPO}*, branch ${BUILDKITE_BRANCH} failed";
+  COLOR="danger"
 fi
 
 JSON=$(curl -sL -X POST \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
-  -d "{\"channel\": \"${CHANNEL}\", \"text\": \"${MESSAGE}\", \"ts\": \"${SLACK_TS}\"}" \
-  https://slack.com/api/chat.update)
+  -d "{\
+    \"channel\": \"${CHANNEL}\", \"ts\": \"${SLACK_TS}\",\
+    \"attachments\": [{\
+      \"color\": \"${COLOR}\",\
+      \"fields\": [\
+        {\"short\": true, \"title\": \"Repo\", \"value\": \"${BUILDKITE_REPO}\"},\
+        {\"short\": true, \"title\": \"Branch\", \"value\": \"${BUILDKITE_BRANCH}\"},\
+        {\"short\": true, \"title\": \"Build\", \"value\": \"<${BUILDKITE_BUILD_URL} | ${BUILDKITE_BUILD_ID}>\"},\
+        {\"short\": true, \"title\": \"Job\", \"value\": \"${BUILDKITE_LABEL}\"}\
+      ]\
+    }]\
+  }" https://slack.com/api/chat.update)
