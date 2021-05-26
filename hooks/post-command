@@ -5,12 +5,10 @@ set -euo pipefail
 TOKEN=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_TOKEN:-"SLACK_TOKEN"})
 CHANNEL=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_CHANNEL:-"SLACK_CHANNEL"})
 
-STATUS="succeeded"
+MESSAGE=":ok_hand: Job *${BUILDKITE_LABEL}* in repository *${BUILDKITE_REPO}*, branch ${BUILDKITE_BRANCH} completed";
 if [ ${BUILDKITE_COMMAND_EXIT_STATUS} -ne 0 ]; then
-  STATUS="failed"
+  MESSAGE=":no_entry: Job *${BUILDKITE_LABEL}* in repository *${BUILDKITE_REPO}*, branch ${BUILDKITE_BRANCH} failed";
 fi
-
-MESSAGE="Job ${BUILDKITE_LABEL} in repository ${BUILDKITE_REPO}, branch ${BUILDKITE_BRANCH} ${STATUS}";
 
 JSON=$(curl -sL -X POST \
   -H "Content-Type: application/json" \

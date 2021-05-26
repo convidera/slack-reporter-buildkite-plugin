@@ -4,7 +4,7 @@ set -euo pipefail
 
 TOKEN=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_TOKEN:-"SLACK_TOKEN"})
 CHANNEL=$(printenv ${BUILDKITE_PLUGIN_SLACK_REPORTER_CHANNEL:-"SLACK_CHANNEL"})
-MESSAGE="Job ${BUILDKITE_LABEL} in repository ${BUILDKITE_REPO}, branch ${BUILDKITE_BRANCH} started";
+MESSAGE=":runner: Job *${BUILDKITE_LABEL}* in repository *${BUILDKITE_REPO}*, branch *${BUILDKITE_BRANCH}* started";
 
 JSON=$(curl -sL -X POST \
   -H "Content-Type: application/json" \
